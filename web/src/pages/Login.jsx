@@ -47,8 +47,8 @@ function Login() {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', color: theme => theme.palette.grey[500] }}>
               <Box>
-                <Typography>Hint: trungquandev.official@gmail.com</Typography>
-                <Typography>Pass: trungquandev@123</Typography>
+                <Typography>Hint: dokyanh.official@gmail.com</Typography>
+                <Typography>Pass: dokyanh@123</Typography>
               </Box>
             </Box>
             <Box sx={{ padding: '0 1em 1em 1em' }}>
@@ -61,7 +61,8 @@ function Login() {
                   variant="outlined"
                   error={!!errors.email}
                   {...register('email', {
-                    required: 'This field is required.'
+                    required: 'This field is required.',
+                    setValueAs: v => v.trim()
                   })}
                 />
                 {errors.email &&
@@ -79,7 +80,8 @@ function Login() {
                   variant="outlined"
                   error={!!errors.password}
                   {...register('password', {
-                    required: 'This field is required.'
+                    required: 'This field is required.',
+                    setValueAs: v => v.trim()
                   })}
                 />
                 {errors.password &&
