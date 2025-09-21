@@ -8,22 +8,16 @@ import Alert from '@mui/material/Alert'
 import { useForm } from 'react-hook-form'
 import Typography from '@mui/material/Typography'
 import dokyanhIcon from '../assets/xiaomi-logo.png'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 import { API_ROOT } from '~/utils/constants'
+import authorizeAxiosInstance from '~/utils/authorizedAxios'
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm()
 
   const submitLogIn = async (data) => {
-    console.log('submit login: ', data)
-    try {
-      const res = await axios.post(`${API_ROOT}/v1/users/login`, data)
-      console.log(res.data)
-      toast.success(res.data?.message)
-    } catch (error) {
-      toast.error(error.response?.data?.message || error?.message)
-    }
+    const res = await authorizeAxiosInstance.post(`${API_ROOT}/v1/users/login`, data)
+    toast.success(res.data?.message)
   }
 
   return (
