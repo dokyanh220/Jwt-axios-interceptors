@@ -13,7 +13,6 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       const res = await authorizeAxiosInstance.get(`${API_ROOT}/v1/dashboards/access`)
-      console.log(res.data)
       setUser(res.data)
     }
     fetchData()

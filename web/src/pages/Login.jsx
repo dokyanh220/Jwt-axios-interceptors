@@ -8,16 +8,26 @@ import Alert from '@mui/material/Alert'
 import { useForm } from 'react-hook-form'
 import Typography from '@mui/material/Typography'
 import dokyanhIcon from '../assets/xiaomi-logo.png'
-import { toast } from 'react-toastify'
 import { API_ROOT } from '~/utils/constants'
 import authorizeAxiosInstance from '~/utils/authorizedAxios'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm()
+  const navigate = useNavigate()
 
   const submitLogIn = async (data) => {
     const res = await authorizeAxiosInstance.post(`${API_ROOT}/v1/users/login`, data)
-    toast.success(res.data?.message)
+    const userInfo = {
+      id: res.data.id,
+      email: res.data.email
+    }
+    localStorage.setItem('accessToken', res.data.accessToken)
+    localStorage.setItem('refreshToken', res.data.refreshToken)
+    localStorage.setItem('userInfo', JSON.stringify(userInfo))
+
+    // Điều hướng khi login thành công
+    navigate('/dashboard')
   }
 
   return (

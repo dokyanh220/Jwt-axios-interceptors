@@ -11,6 +11,15 @@ authorizeAxiosInstance.defaults.withCredentials = true
 
 // Interceptor request can thiệp vào giữa những request API
 authorizeAxiosInstance.interceptors.request.use((config) => {
+  // Lấy accessToken từ localStorage đính kèm vào header
+  const accessToken = localStorage.getItem('accessToken')
+  if (accessToken) {
+    // Cần thêm "Bearer " vì chúng ta nên tuân thủ theo tiêu chuẩn OAuth 2.0 trong việc xác định loại token đang sử dụng
+    // Bearer là định nghĩa loại token dành cho việc xác thực và ủy quyền, tham khảo các loại token khác như:
+    // Basic token, Digest token, OAuth token,...
+    config.headers.Authorization = `Bearer ${accessToken}`
+  }
+
   return config
 }, (error) => {
   // Do something with request error
