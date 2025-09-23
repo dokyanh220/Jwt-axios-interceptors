@@ -33,7 +33,7 @@ authorizeAxiosInstance.interceptors.response.use((response) => {
   // Any status codes that falls outside the range of 200-299 cause this function to trigger
   // Dùng toastify để hiện bất kể mã lỗi trên màn hình - ngoại trừ mã 410 - GONE phục vụ việc tự động refesh lại token
   if (error.response?.status !== 410) {
-    toast.error(error.response?.message || error?.message)
+    toast.error(error.response?.data.message || error?.message)
   }
   return Promise.reject(error)
 })

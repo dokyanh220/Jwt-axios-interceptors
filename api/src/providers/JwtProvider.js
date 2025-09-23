@@ -17,10 +17,10 @@ const genarateToken = async (useInfo, secretSignature, tokenLife) => {
  * Function kiểm tra Token
  * Token hợp lệ là được tạo ra đúng với secretSignature trong dự án
  */
-const verifyToken = async (token, secretSignature, ) => {
+const verifyToken = async (token, secretSignature ) => {
   try {
     // Hàm verify() của JWT
-    return verify(token, secretSignature, )
+    return verify(token, secretSignature )
   } catch (error) { throw new Error (error) }
 }
 

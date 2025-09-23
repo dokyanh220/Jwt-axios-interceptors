@@ -33,6 +33,7 @@ const login = async (req, res) => {
     const accessToken = await JwtProvider.genarateToken(
       userInfo,
       ACCESS_TOKEN_SECRET_SIGNATURE,
+      // 5 // 5 giây hết hạn
       '1h'
     )
 
@@ -68,16 +69,9 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    if (req.body.email !== MOCK_DATABASE.USER.EMAIL || req.body.password !== MOCK_DATABASE.USER.PASSWORD) {
-      res.status(StatusCodes. UNAUTHORIZED).json({ message: 'Your email or password is incorrect!' })
-      return
-    }
-
-    // Trường hợp nhập đúng thông tin tài khoản, tạo token và trả về cho phía Client
-    // Tạo thông tin payload để đính kèm trong JWT Token: bao gồm id và email của user
-    const userInfo = {
-
-    }
+    // Xóa cookie
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
 
     res.status(StatusCodes.OK).json({ message: 'Logout API success!' })
   } catch (error) {
