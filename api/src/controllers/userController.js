@@ -41,6 +41,7 @@ const login = async (req, res) => {
       userInfo,
       REFRESH_TOKEN_SECRET_SIGNATURE,
       '14 days'
+      // 15
     )
 
     /**
@@ -106,7 +107,7 @@ const refreshToken = async (req, res) => {
       '1h'
     )
 
-    // Res lại cookie accessToken mới cho trường hợp sử dụng cookie
+    // Res lại cookie accessToken mới cho trường hợp sử dụng cookiea
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: true,

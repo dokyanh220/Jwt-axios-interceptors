@@ -8,7 +8,7 @@ Router.route('/login')
   .post(userController.login)
 
 // API đăng xuất.
-Router.route('/logfout')
+Router.route('/logout')
   .delete(userController.logout)
 
 // API Refresh Token - Cấp lại Access Token mới.

@@ -21,8 +21,6 @@ function App() {
         <Navigate to="/login" replace={true} />
       } />
 
-      <Route path='/login' element={<Login />} />
-
       <Route element={<UnauthorizeRoutes />}>
         <Route path='/login' element={<Login />} />
       </Route>
