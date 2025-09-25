@@ -27,6 +27,11 @@ authorizeAxiosInstance.interceptors.request.use((config) => {
   return Promise.reject(error)
 })
 
+// Khởi tạo promise cho việc gọi API refreshToken
+// Mục đích: để khi nhận yêu cầu refreshToken, đầu tiên hold lại việc gọi API refresh_token cho tới khi thành công mới retry
+// lại những api bị lỗi trước đó thay vị gọi refreshToken nhiều lần khi gặp request lỗi
+let refreshTokenPromise = null
+
 // Interceptor response can thiệp vào giữa response nhận về từ API
 authorizeAxiosInstance.interceptors.response.use((response) => {
   return response
@@ -45,37 +50,43 @@ authorizeAxiosInstance.interceptors.response.use((response) => {
   }
   // Nếu như nhận mã 410, gọi API refresh token làm mới accessToken
   const originalRequest = error.config
-  if (error.response?.status === 410 && !originalRequest._retry) {
-    // Gán thêm giá trị _retry = true trong thời gian chờ, để việc refresh token luôn gọi 1 lần tại 1 thời điểm
-    originalRequest._retry = true
-    // Lấy refreshToken từ localStorage(trường hợp dùng localStorage)
-    const refreshToken = localStorage.getItem('refreshToken')
-    if (refreshToken) {
-      // Gọi API lấy accessToken mới
-      return refreshTokenAPI()
-        .then((res) => {
-          // Lấy và gán accessToken mới vào localStorage
-          const { accessToken } = res.data
-          localStorage.setItem('accessToken', accessToken)
-          authorizeAxiosInstance.defaults.headers.Authorization = `Bearer ${accessToken}`
+  if (error.response?.status === 410 && originalRequest) {
+    if (!refreshTokenPromise) {
+      // Lấy refreshToken từ localStorage(trường hợp dùng localStorage)
+      const refreshToken = localStorage.getItem('refreshToken')
+      if (refreshToken) {
+        // Gọi API lấy accessToken mới
+        refreshTokenPromise = refreshTokenAPI(refreshToken)
+          .then((res) => {
+            // Lấy và gán accessToken mới vào localStorage
+            const { accessToken } = res.data
+            localStorage.setItem('accessToken', accessToken)
+            authorizeAxiosInstance.defaults.headers.Authorization = `Bearer ${accessToken}`
 
-          // Đồng thời accessToken mới cũng được update vào Cookie
-
-          // Gọi lại request vừa bị lỗi 410 bằng accessToken mới
-          return authorizeAxiosInstance(originalRequest)
-        })
-        .catch((_error) => {
-          // Nếu như nhận bất kỳ lỗi nào từ API refreshToken thì logout luôn
-          handleLogoutAPI().then(() => {
-            // Nếu dùng cookie phải xóa userInfo trong localStorage
-            // localStorage.removeItem('userInfo')
-            // Điều hướng login
-            location.href = '/login'
+            // Đồng thời accessToken mới cũng được update vào Cookie
           })
-
-          return Promise.reject(_error)
-        })
+          .catch((_error) => {
+            // Nếu như nhận bất kỳ lỗi nào từ API refreshToken thì logout luôn
+            handleLogoutAPI().then(() => {
+              // Nếu dùng cookie phải xóa userInfo trong localStorage
+              // localStorage.removeItem('userInfo')
+              // Điều hướng login
+              location.href = '/login'
+            })
+            return Promise.reject(_error)
+          })
+          .finally(() => {
+            // Dù API refresh_token thành công hay thất bại cũng phải gán lại bằng null để lần sau có thể gọi tiếp
+            refreshTokenPromise = null
+          })
+      }
     }
+
+    // Bước cuối return refreshTokenPromise trong trường hợp thành công
+    return refreshTokenPromise.then(() => {
+      // Gọi lại request vừa bị lỗi 410 bằng accessToken mới
+      return authorizeAxiosInstance(originalRequest)
+    })
   }
 
   // Dùng toastify để hiện bất kể mã lỗi trên màn hình - ngoại trừ mã 410 - GONE phục vụ việc tự động refesh lại token

@@ -33,15 +33,15 @@ const login = async (req, res) => {
     const accessToken = await JwtProvider.genarateToken(
       userInfo,
       ACCESS_TOKEN_SECRET_SIGNATURE,
-      // 5 // 5 giây hết hạn
-      '1h'
+      5 // 5 giây hết hạn
+      // '1h'
     )
 
     const refreshToken = await JwtProvider.genarateToken(
       userInfo,
       REFRESH_TOKEN_SECRET_SIGNATURE,
-      '14 days'
-      // 15
+      // '14 days'
+      30
     )
 
     /**
@@ -51,6 +51,12 @@ const login = async (req, res) => {
     * thời gian sống của cookie khác với cái thời gian sống của token nhé. Đừng bị nhầm lẫn :D
     */
     res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
+    })
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
@@ -89,8 +95,8 @@ const refreshToken = async (req, res) => {
 
     // Verify / giải mã cái refresh token xem có hợp lệ không
     const refreshTokenDecoded = await JwtProvider.verifyToken(
-      // refreshTokenFromCookie,
-      refreshTokenFromBody,
+      refreshTokenFromCookie,
+      // refreshTokenFromBody,
       REFRESH_TOKEN_SECRET_SIGNATURE
     )
     // Đoạn này vì chúng ta chỉ lưu những thông tin unique và cổ định của user trong token rồi, vì vậy có thể
@@ -103,8 +109,8 @@ const refreshToken = async (req, res) => {
     const accessToken = await JwtProvider.genarateToken(
       userInfo,
       ACCESS_TOKEN_SECRET_SIGNATURE,
-      // 5 // 5 giây hết hạn
-      '1h'
+      5 // 5 giây hết hạn
+      // '1h'
     )
 
     // Res lại cookie accessToken mới cho trường hợp sử dụng cookiea
